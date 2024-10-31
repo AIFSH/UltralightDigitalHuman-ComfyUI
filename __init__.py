@@ -17,6 +17,7 @@ udh_output_dir = osp.join(output_dir,"UltralightDigitalHuman")
 # os.makedirs(udh_output_dir,exist_ok=True)
 from huggingface_hub import snapshot_download
 hubert_model_dir = osp.join(udh_ckpt_dir,"hubert-large-ls960-ft")
+
 class TrainUltralightDigitalHumanNode:
     def __init__(self,):
         if not osp.exists(osp.join(hubert_model_dir,"pytorch_model.bin")):
@@ -27,9 +28,14 @@ class TrainUltralightDigitalHumanNode:
         
     @classmethod
     def INPUT_TYPES(s):
+        name_list = [name.split('_')[0] for name in os.listdir(udh_output_dir)]
         return {
             "required":{
                 "train_video":("VIDEO",),
+                "template_name":("STRING",{
+                    "default": "aifsh",
+                    "tooltip":f"can be new or in {name_list}",
+                }),
                 "asr":(['hubert','wenet'],),
                 "patient":("INT",{
                     "default":3,
@@ -65,22 +71,26 @@ class TrainUltralightDigitalHumanNode:
 
     CATEGORY = "AIFSH_UltralightDigitalHuman"
 
-    def gen_video(self,train_video,asr,patient,epochs,batch_size,learning_rate,
+    def gen_video(self,train_video,template_name,asr,patient,
+                  epochs,batch_size,learning_rate,
                   train_again,if_process,if_syncnet):
         ## Data Process
-        dataset_dir = osp.join(udh_output_dir,"dataset")
-        ckpt_dir = osp.join(udh_output_dir,"checkpoint")
-        syncnet_ckpt_dir = osp.join(udh_output_dir,"syncnet_ckpt")
+        template_name = template_name + "_" + asr
+        template_output_dir = osp.join(udh_output_dir, template_name)
+        dataset_dir = osp.join(template_output_dir,"dataset")
+        ckpt_dir = osp.join(template_output_dir,"checkpoint")
+        syncnet_ckpt_dir = osp.join(template_output_dir,"syncnet_ckpt")
         ckpt_path = osp.join(ckpt_dir,"min_loss.pth")
         if not train_again and osp.exists(ckpt_path):
             output_config = {
+                "template_name":template_name,
                 "asr": asr,
                 "dataset_dir": dataset_dir,
                 "ckpt_path":ckpt_path
             }
             return (output_config,)
         else:
-            os.makedirs(udh_output_dir,exist_ok=True)
+            os.makedirs(template_output_dir,exist_ok=True)
         os.makedirs(dataset_dir,exist_ok=True)
         os.makedirs(ckpt_dir,exist_ok=True)
         if if_process:
@@ -121,6 +131,7 @@ class TrainUltralightDigitalHumanNode:
         print(cmd)
         os.system(cmd)
         output_config = {
+            "template_name":template_name,
             "asr": asr,
             "dataset_dir": dataset_dir,
             "ckpt_path":ckpt_path
@@ -148,7 +159,7 @@ class InferUltralightDigitalHumanNode:
     CATEGORY = "AIFSH_UltralightDigitalHuman"
 
     def gen_video(self,driving_audio,train_result):
-        infer_dir = osp.join(udh_output_dir,"inference")
+        infer_dir = osp.join(udh_output_dir,train_result['template_name'],"inference")
         os.makedirs(infer_dir,exist_ok=True)
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=False,dir=infer_dir) as f:
             waveform = driving_audio['waveform'][0]
