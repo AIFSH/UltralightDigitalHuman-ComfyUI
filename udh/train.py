@@ -96,7 +96,7 @@ def train(net, epoch, batch_size, lr,patient):
         random_i = random.randint(0, len(dataset_dir_list)-1)
         dataset = dataset_list[random_i]
         train_dataloader = dataloader_list[random_i]
-        
+        loss_list = []
         with tqdm(total=len(dataset), desc=f'Epoch {e + 1}/{epoch}', unit='img') as p:
             for batch in train_dataloader:
                 imgs, labels, audio_feat = batch
@@ -116,23 +116,22 @@ def train(net, epoch, batch_size, lr,patient):
                     loss = loss_pixel + loss_PerceptualLoss*0.01
                 p.set_postfix(**{'loss (batch)': loss.item()})
                 optimizer.zero_grad(set_to_none=True)
+                loss_list.append(loss.item())
                 loss.backward()
                 optimizer.step()
                 p.update(imgs.shape[0])
-        cur_loss = loss.item()
+        cur_loss = np.mean(loss_list)
+        print(f"Epoch {e+1} Loss:{cur_loss}")
         if min_loss > cur_loss:
             min_loss = cur_loss
-            min_loss_step = e
+            min_loss_step = e + 1
             skip_step = 0
             model_state = net.state_dict()
         else:
             skip_step += 1
         if skip_step == patient:
             break
-        '''
-        if e % 5 == 0:
-            torch.save(net.state_dict(), os.path.join(save_dir, str(e)+'.pth'))
-        '''
+        
         if args.see_res:
             net.eval()
             img_concat_T, img_real_T, audio_feat = dataset.__getitem__(random.randint(0, dataset.__len__()))
@@ -154,5 +153,7 @@ if __name__ == '__main__':
     
     
     net = Model(6).cuda()
-    # net.load_state_dict(torch.load("/usr/anqi/dihuman/checkpoint_female4/3070.pth"))
+    if os.path.exists(os.environ['ckpt_path']):
+        net.load_state_dict(torch.load(os.environ['ckpt_path']))
+        print("training from last min_loss checkpoint")
     train(net, args.epochs, args.batchsize, args.lr,args.patient)

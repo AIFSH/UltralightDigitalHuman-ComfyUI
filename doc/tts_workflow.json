@@ -1,0 +1,376 @@
+{
+  "last_node_id": 15,
+  "last_link_id": 16,
+  "nodes": [
+    {
+      "id": 14,
+      "type": "LoadAudio",
+      "pos": {
+        "0": 812,
+        "1": 511
+      },
+      "size": {
+        "0": 315,
+        "1": 124
+      },
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            15
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadAudio"
+      },
+      "widgets_values": [
+        "aifsh.mp3",
+        null,
+        ""
+      ]
+    },
+    {
+      "id": 13,
+      "type": "PromptTextNode",
+      "pos": {
+        "0": 352,
+        "1": 514
+      },
+      "size": {
+        "0": 400,
+        "1": 200
+      },
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "TEXT",
+          "type": "TEXT",
+          "links": [
+            14
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "PromptTextNode"
+      },
+      "widgets_values": [
+        "面面宝贝，一周岁啦！愿你像小小的探险家，在成长的道路上勇敢前行，发现每一个快乐的秘密，解锁每一个美好的瞬间。愿你的世界像彩虹糖一样，多彩又甜蜜，让每一天都充满无限可能和惊喜"
+      ]
+    },
+    {
+      "id": 12,
+      "type": "MaskGCTNode",
+      "pos": {
+        "0": 563,
+        "1": 398
+      },
+      "size": {
+        "0": 216.59999084472656,
+        "1": 66
+      },
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "target_text",
+          "type": "TEXT",
+          "link": 14
+        },
+        {
+          "name": "prompt_wav",
+          "type": "AUDIO",
+          "link": 15
+        },
+        {
+          "name": "prompt_text",
+          "type": "TEXT",
+          "link": null,
+          "shape": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "AUDIO",
+          "type": "AUDIO",
+          "links": [
+            13,
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "MaskGCTNode"
+      }
+    },
+    {
+      "id": 3,
+      "type": "InferUltralightDigitalHumanNode",
+      "pos": {
+        "0": 431,
+        "1": 270
+      },
+      "size": {
+        "0": 390.5999755859375,
+        "1": 78
+      },
+      "flags": {},
+      "order": 6,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "driving_audio",
+          "type": "AUDIO",
+          "link": 13
+        },
+        {
+          "name": "train_result",
+          "type": "CONFIG",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "InferUltralightDigitalHumanNode"
+      },
+      "widgets_values": [
+        20
+      ]
+    },
+    {
+      "id": 7,
+      "type": "TrainUltralightDigitalHumanNode",
+      "pos": {
+        "0": 431,
+        "1": -39
+      },
+      "size": {
+        "0": 390.5999755859375,
+        "1": 250
+      },
+      "flags": {},
+      "order": 4,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "train_video",
+          "type": "VIDEO",
+          "link": 7
+        }
+      ],
+      "outputs": [
+        {
+          "name": "train_result",
+          "type": "CONFIG",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "TrainUltralightDigitalHumanNode"
+      },
+      "widgets_values": [
+        "aifsh",
+        "hubert",
+        5,
+        200,
+        16,
+        0.001,
+        false,
+        false,
+        false
+      ]
+    },
+    {
+      "id": 15,
+      "type": "PreviewAudio",
+      "pos": {
+        "0": 826,
+        "1": 367
+      },
+      "size": {
+        "0": 315,
+        "1": 76
+      },
+      "flags": {},
+      "order": 5,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": 16
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreviewAudio"
+      },
+      "widgets_values": [
+        null
+      ]
+    },
+    {
+      "id": 2,
+      "type": "LoadVideo",
+      "pos": {
+        "0": -32,
+        "1": -10
+      },
+      "size": {
+        "0": 315,
+        "1": 612.4444580078125
+      },
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VIDEO",
+          "type": "VIDEO",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadVideo"
+      },
+      "widgets_values": [
+        "aifsh.mp4",
+        "Video",
+        {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "PreViewVideo",
+      "pos": {
+        "0": 1162,
+        "1": -17
+      },
+      "size": {
+        "0": 210,
+        "1": 729.5555419921875
+      },
+      "flags": {},
+      "order": 7,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "video",
+          "type": "VIDEO",
+          "link": 4
+        }
+      ],
+      "outputs": [],
+      "properties": {
+        "Node name for S&R": "PreViewVideo"
+      },
+      "widgets_values": [
+        {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      ]
+    }
+  ],
+  "links": [
+    [
+      4,
+      3,
+      0,
+      5,
+      0,
+      "VIDEO"
+    ],
+    [
+      7,
+      2,
+      0,
+      7,
+      0,
+      "VIDEO"
+    ],
+    [
+      8,
+      7,
+      0,
+      3,
+      1,
+      "CONFIG"
+    ],
+    [
+      13,
+      12,
+      0,
+      3,
+      0,
+      "AUDIO"
+    ],
+    [
+      14,
+      13,
+      0,
+      12,
+      0,
+      "TEXT"
+    ],
+    [
+      15,
+      14,
+      0,
+      12,
+      1,
+      "AUDIO"
+    ],
+    [
+      16,
+      12,
+      0,
+      15,
+      0,
+      "AUDIO"
+    ]
+  ],
+  "groups": [],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.8264462809917354,
+      "offset": [
+        195.07200000000023,
+        94.108
+      ]
+    }
+  },
+  "version": 0.4
+}

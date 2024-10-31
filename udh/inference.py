@@ -10,11 +10,13 @@ from torch.utils.data import DataLoader
 from unet import Model
 # from unet2 import Model
 # from unet_att import Model
-
+from face_mask import FaceMask
 import time
+from tqdm import tqdm
 parser = argparse.ArgumentParser(description='Train',
                                      formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
+parser.add_argument('--offset', type=int, default=20)
 parser.add_argument('--asr', type=str, default="hubert")
 parser.add_argument('--dataset', type=str, default="")  
 parser.add_argument('--audio_feat', type=str, default="")
@@ -63,7 +65,8 @@ img_idx = 0
 net = Model(6, mode).cuda()
 net.load_state_dict(torch.load(checkpoint))
 net.eval()
-for i in range(audio_feats.shape[0]):
+face_mask = FaceMask()
+for i in tqdm(range(audio_feats.shape[0]),desc="inference..."):
     if img_idx>len_img - 1:
         step_stride = -1
     if img_idx<1:
@@ -116,9 +119,13 @@ for i in range(audio_feats.shape[0]):
         
     pred = pred.cpu().numpy().transpose(1,2,0)*255
     pred = np.array(pred, dtype=np.uint8)
-    crop_img_ori[4:164, 4:164] = pred
+    # crop_img_ori[4:164, 4:164] = pred
+    crop_img_ori[4+args.offset:164-args.offset,4+args.offset:164-args.offset] = pred[args.offset:160-args.offset,args.offset:160-args.offset]
     crop_img_ori = cv2.resize(crop_img_ori, (w, h))
+        
     img[ymin:ymax, xmin:xmax] = crop_img_ori
+    mask = face_mask(crop_img_ori)
+    img[ymin:ymax, xmin:xmax] = img[ymin:ymax, xmin:xmax] * (1 - mask[..., None]) + crop_img_ori * mask[..., None]
     video_writer.write(img)
 video_writer.release()
 

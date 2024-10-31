@@ -233,6 +233,7 @@ def train(save_dir, dataset_dir, mode,patient,batch_size):
     skip_step = 0
     with tqdm(total=40, desc='training syncnet') as p:
         for epoch in range(40):
+            loss_list = []
             for batch in train_data_loader:
                 imgT, audioT, y = batch
                 imgT = imgT.cuda()
@@ -240,10 +241,11 @@ def train(save_dir, dataset_dir, mode,patient,batch_size):
                 y = y.cuda()
                 audio_embedding, face_embedding = model(imgT, audioT)
                 loss = cosine_loss(audio_embedding, face_embedding, y)
+                loss_list.append(loss.item())
                 loss.backward()
                 optimizer.step()
             
-            loss_info = loss.item()
+            loss_info = np.mean(loss_list)
             if min_loss > loss_info:
                 min_loss = loss_info
                 min_loss_step = epoch

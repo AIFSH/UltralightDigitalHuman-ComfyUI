@@ -81,6 +81,7 @@ class TrainUltralightDigitalHumanNode:
         ckpt_dir = osp.join(template_output_dir,"checkpoint")
         syncnet_ckpt_dir = osp.join(template_output_dir,"syncnet_ckpt")
         ckpt_path = osp.join(ckpt_dir,"min_loss.pth")
+        os.environ['ckpt_path'] = ckpt_path
         if not train_again and osp.exists(ckpt_path):
             output_config = {
                 "template_name":template_name,
@@ -146,6 +147,14 @@ class InferUltralightDigitalHumanNode:
             "required":{
                 "driving_audio":("AUDIO",),
                 "train_result":("CONFIG",),
+                "offset":("INT",{
+                    "default": 10,
+                    "tooltip":"set offset to fix bug pred",
+                    "max":40,
+                    "min":0,
+                    "step":10,
+                    "display":"slider",
+                })
             }
         }
     
@@ -158,7 +167,7 @@ class InferUltralightDigitalHumanNode:
 
     CATEGORY = "AIFSH_UltralightDigitalHuman"
 
-    def gen_video(self,driving_audio,train_result):
+    def gen_video(self,driving_audio,train_result,offset):
         infer_dir = osp.join(udh_output_dir,train_result['template_name'],"inference")
         os.makedirs(infer_dir,exist_ok=True)
         with tempfile.NamedTemporaryFile(suffix=".wav",delete=False,dir=infer_dir) as f:
@@ -180,7 +189,7 @@ class InferUltralightDigitalHumanNode:
 
         save_path = osp.join(infer_dir,f"{audio_base_name}.mp4")
         py_path = osp.join(base_dir,"inference.py")
-        cmd = f"""{py} {py_path} --asr {asr} --dataset {train_result['dataset_dir']} \
+        cmd = f"""{py} {py_path} --offset {offset} --asr {asr} --dataset {train_result['dataset_dir']} \
             --audio_feat {audio_feat} --checkpoint {train_result['ckpt_path']} --save_path {save_path}"""
 
         print(cmd)
