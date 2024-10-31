@@ -1,0 +1,5 @@
+mkl
+opencv-python
+soundfile
+librosa
+onnxruntime
