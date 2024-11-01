@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 from tqdm import tqdm
 import os.path as osp
+import sys
 now_dir = osp.dirname(__file__)
 def extract_audio(path, out_path, sample_rate=16000):
     
@@ -12,10 +13,10 @@ def extract_audio(path, out_path, sample_rate=16000):
     cmd = f'ffmpeg -i {path} -f wav -ar {sample_rate} {out_path} -y'
     os.system(cmd)
     print(f'[INFO] ===== extracted audio =====')
-    
+py = sys.executable or 'python'
 def extract_images(path, mode):
     
-    full_body_dir = path.replace(path.split("/")[-1], "full_body_img")
+    full_body_dir = osp.join(osp.dirname(path), "full_body_img")
     if not os.path.exists(full_body_dir):
         os.mkdir(full_body_dir)
     
@@ -41,10 +42,10 @@ def get_audio_feature(wav_path, mode):
     
     if mode == "wenet":
         py_path = osp.join(now_dir,"wenet_infer.py")
-        os.system(f"python {py_path} {wav_path}")
+        os.system(f"{py} {py_path} {wav_path}")
     if mode == "hubert":
         py_path = osp.join(now_dir,"hubert.py")
-        os.system(f"python {py_path} --wav {wav_path}")
+        os.system(f"{py} {py_path} --wav {wav_path}")
     
 def get_landmark(path, landmarks_dir):
     full_img_dir = osp.join(osp.dirname(path), "full_body_img")

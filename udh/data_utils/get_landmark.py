@@ -1,5 +1,4 @@
 import argparse
-from os import wait3
 import os.path as osp
 import numpy as np
 import cv2

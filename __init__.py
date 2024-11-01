@@ -10,7 +10,7 @@ udh_ckpt_dir = osp.join(aifsh_dir,"UltralightDigitalHuman")
 sys.path.append(now_dir)
 
 import torchaudio
-py = 'python' or sys.executable
+py = sys.executable or 'python'
 base_dir = osp.join(now_dir,"udh")
 output_dir = folder_paths.get_output_directory()
 udh_output_dir = osp.join(output_dir,"UltralightDigitalHuman")
