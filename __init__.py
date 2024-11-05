@@ -28,7 +28,11 @@ class TrainUltralightDigitalHumanNode:
         
     @classmethod
     def INPUT_TYPES(s):
-        name_list = [name.split('_')[0] for name in os.listdir(udh_output_dir)]
+        # name_list = [name.split('_')[0] for name in os.listdir(udh_output_dir)]
+        try:
+            name_list = [name.split('@')[0] for name in os.listdir(udh_output_dir)]
+        except:
+            name_list = []
         return {
             "required":{
                 "train_video":("VIDEO",),
@@ -75,7 +79,7 @@ class TrainUltralightDigitalHumanNode:
                   epochs,batch_size,learning_rate,
                   train_again,if_process,if_syncnet):
         ## Data Process
-        template_name = template_name + "_" + asr
+        template_name = template_name + "@" + asr
         template_output_dir = osp.join(udh_output_dir, template_name)
         dataset_dir = osp.join(template_output_dir,"dataset")
         ckpt_dir = osp.join(template_output_dir,"checkpoint")
