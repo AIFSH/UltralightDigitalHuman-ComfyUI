@@ -66,9 +66,24 @@ def get_landmark(path, landmarks_dir):
         del landmark
         torch.cuda.empty_cache()
         
-    from joblib import Parallel, delayed
     img_list = os.listdir(full_img_dir)
-    Parallel(n_jobs=-1)(delayed(single_process)(img_name) for img_name in tqdm(img_list,desc="detecting landmarks..."))
+    try:
+        from joblib import Parallel, delayed
+        Parallel(n_jobs=-1)(delayed(single_process)(img_name) for img_name in tqdm(img_list,desc="detecting landmarks..."))
+    except:
+        from get_landmark import Landmark
+        landmark = Landmark()
+        for img_name in tqdm(img_list,desc="detecting landmarks..."):
+            img_path = os.path.join(full_img_dir, img_name)
+            lms_path = os.path.join(landmarks_dir, img_name.replace(".jpg", ".lms"))
+            pre_landmark, x1, y1 = landmark.detect(img_path)
+            with open(lms_path, "w") as f:
+                for p in pre_landmark:
+                    x, y = p[0]+x1, p[1]+y1
+                    f.write(str(x))
+                    f.write(" ")
+                    f.write(str(y))
+                    f.write("\n")
     
 if __name__ == "__main__":
     
